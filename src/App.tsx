@@ -202,20 +202,6 @@ const App = () => {
               onTaskClick={setSelectedTask}
             />
           ))}
-          <div className="flex flex-col items-center">
-            <input
-              value={newSectionName}
-              onChange={(e) => setNewSectionName(e.target.value)}
-              placeholder="New section"
-              className="border rounded p-1 mb-1"
-            />
-            <button
-              className="text-green-600 text-2xl"
-              onClick={addNewSection}
-            >
-              +
-            </button>
-          </div>
         </div>
 
         {/* Modals */}
