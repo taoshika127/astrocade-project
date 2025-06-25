@@ -1,28 +1,11 @@
 import React, { useState } from "react";
-import {
-  DndProvider,
-  useDrag,
-  useDrop,
-} from "react-dnd";
+import { Task } from "./shared.types";
+import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { v4 as uuidv4 } from "uuid";
-
-type Task = {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  dueDate: string;
-  priority: "Low" | "Medium" | "High";
-  assignee: string;
-  tags: string[];
-};
-
-const defaultTags = ["super urgent", "complete ASAP", "optional", "work", "casual"];
-
-const initialSections = ["To Do", "In Progress", "Review", "Done"];
-
-const priorities = ["Low", "Medium", "High"];
+import Section from "./components/Section";
+import TaskModal from "./components/TaskModal";
+import { priorities, initialSections, defaultTags} from "./utils/constants";
 
 const generateDummyTasks = (): Task[] => {
   const dummy: Task[] = [];
@@ -43,9 +26,6 @@ const generateDummyTasks = (): Task[] => {
   return dummy;
 };
 
-const ItemType = {
-  TASK: "task",
-};
 
 const App = () => {
   const [tasks, setTasks] = useState<Task[]>(generateDummyTasks());
@@ -57,7 +37,6 @@ const App = () => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<any>({});
   const [sort, setSort] = useState("");
-
   const [tagPool, setTagPool] = useState<string[]>([...defaultTags]);
 
   const moveTask = (taskId: string, newStatus: string) => {
@@ -120,7 +99,7 @@ const App = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitTask = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitTask = (e: React.FormEvent<HTMLFormElement>, submittedTags: string[]) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -131,7 +110,7 @@ const App = () => {
       dueDate: formData.get("dueDate") as string,
       priority: formData.get("priority") as "Low" | "Medium" | "High",
       assignee: formData.get("assignee") as string,
-      tags: editingTask?.tags || [],
+      tags: editingTask?.tags || submittedTags,
       status: formData.get("status") as string,
     };
     if (editingTask) {
@@ -139,7 +118,7 @@ const App = () => {
         prev.map((t) => (t.id === editingTask.id ? newTask : t))
       );
     } else {
-      setTasks((prev) => [...prev, { ...newTask, status: "To Do" }]);
+      setTasks((prev) => [{ ...newTask, status: "To Do" }, ...prev]);
     }
     setIsModalOpen(false);
     setEditingTask(null);
@@ -281,156 +260,6 @@ const App = () => {
         )}
       </div>
     </DndProvider>
-  );
-};
-
-// Section Component
-const Section = ({ name, tasks, moveTask, onTaskClick }: any) => {
-  const [, drop] = useDrop({
-    accept: ItemType.TASK,
-    drop: (item: any) => moveTask(item.id, name),
-  });
-
-  return (
-    <div ref={drop} className="w-72 flex-shrink-0 bg-white rounded shadow p-2">
-      <h3 className="font-bold text-lg mb-2">{name}</h3>
-      {tasks.map((task: Task) => (
-        <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
-      ))}
-    </div>
-  );
-};
-
-// TaskCard Component
-const TaskCard = ({ task, onClick }: any) => {
-  const [, drag] = useDrag({
-    type: ItemType.TASK,
-    item: { id: task.id },
-  });
-
-  return (
-    <div
-      ref={drag}
-      onClick={onClick}
-      className="bg-gray-100 p-2 rounded mb-2 cursor-pointer shadow"
-    >
-      <p className="font-semibold">{task.name}</p>
-      <p className="text-sm">{task.dueDate}</p>
-      <p className="text-xs">{task.priority}</p>
-    </div>
-  );
-};
-
-// TaskModal Component
-const TaskModal = ({ onClose, onSubmit, task, tags, setTags }: any) => {
-  const [currentTags, setCurrentTags] = useState<string[]>(task?.tags || []);
-  const [availableTags, setAvailableTags] = useState<string[]>(
-    tags.filter((tag: string) => !currentTags.includes(tag))
-  );
-  const [newTag, setNewTag] = useState("");
-  const [error, setError] = useState("");
-
-  const addTag = () => {
-    if (!newTag) {
-      setError("Tag cannot be empty");
-      return;
-    }
-    if (currentTags.includes(newTag) || availableTags.includes(newTag)) {
-      setError("Tag already exists");
-      return;
-    }
-    setCurrentTags((prev) => [...prev, newTag]);
-    setTags((prev: string[]) => [...prev, newTag]);
-    setNewTag("");
-    setError("");
-  };
-
-  const removeTag = (tag: string) => {
-    setCurrentTags((prev) => prev.filter((t) => t !== tag));
-    setAvailableTags((prev) => [...prev, tag]);
-  };
-
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      onClick={onClose}
-    >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          task.tags = currentTags;
-          onSubmit(e);
-        }}
-        className="bg-white p-6 rounded shadow max-w-md w-full space-y-3"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-xl font-bold">
-          {task ? "Edit Task" : "Create Task"}
-        </h2>
-        <input name="name" defaultValue={task?.name} className="border p-1 w-full" placeholder="Name" required />
-        <textarea name="description" defaultValue={task?.description} className="border p-1 w-full" placeholder="Description" />
-        <input type="date" name="dueDate" defaultValue={task?.dueDate} className="border p-1 w-full" required />
-        <select name="priority" defaultValue={task?.priority} className="border p-1 w-full">
-          {priorities.map((p) => <option key={p}>{p}</option>)}
-        </select>
-        <input name="assignee" defaultValue={task?.assignee} className="border p-1 w-full" placeholder="Assignee" />
-        <select name="status" defaultValue={task?.status || "To Do"} className="border p-1 w-full">
-          {initialSections.map((s) => <option key={s}>{s}</option>)}
-        </select>
-        <div>
-          <p className="text-sm font-semibold">Current tags:</p>
-          <div className="flex flex-wrap gap-1 my-1">
-            {currentTags.map((tag: string) => (
-              <span key={tag} className="bg-blue-200 px-2 py-0.5 rounded text-sm flex items-center">
-                {tag}
-                <button
-                  type="button"
-                  className="ml-1 text-red-600"
-                  onClick={() => removeTag(tag)}
-                >
-                  &times;
-                </button>
-              </span>
-            ))}
-          </div>
-          <p className="text-sm">Choose tags from:</p>
-          <div className="flex flex-wrap gap-1 my-1">
-            {availableTags.map((tag: string) => (
-              <button
-                key={tag}
-                type="button"
-                className="bg-gray-200 px-2 py-0.5 rounded text-sm"
-                onClick={() => {
-                  setCurrentTags((prev) => [...prev, tag]);
-                  setAvailableTags((prev) => prev.filter((t) => t !== tag));
-                }}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2 mt-2">
-            <input
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              placeholder="enter a new tag name"
-              className="border p-1 w-full"
-            />
-            <button
-              type="button"
-              className="bg-green-500 text-white px-3 rounded"
-              onClick={addTag}
-            >
-              Add
-            </button>
-          </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-        </div>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-1 rounded">
-          Submit
-        </button>
-      </form>
-    </div>
   );
 };
 
