@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { priorities, initialSections} from "../utils/constants";
+import Tag from './Tag';
 
 const TaskModal = ({ onClose, onSubmit, task, tags, setTags }: any) => {
   const [currentTags, setCurrentTags] = useState<string[]>(task?.tags || []);
@@ -62,32 +63,23 @@ const TaskModal = ({ onClose, onSubmit, task, tags, setTags }: any) => {
           <p className="text-sm font-semibold">Current tags:</p>
           <div className="flex flex-wrap gap-1 my-1">
             {currentTags.map((tag: string) => (
-              <span key={tag} className="bg-blue-200 px-2 py-0.5 rounded text-sm flex items-center">
-                {tag}
-                <button
-                  type="button"
-                  className="ml-1 text-red-600"
-                  onClick={() => removeTag(tag)}
-                >
-                  &times;
-                </button>
-              </span>
+             <Tag key={tag}
+             text={tag}
+             onClick={() => removeTag(tag)}
+             canRemove={true}
+             />
             ))}
           </div>
           <p className="text-sm">Choose tags from:</p>
           <div className="flex flex-wrap gap-1 my-1">
             {availableTags.map((tag: string) => (
-              <button
-                key={tag}
-                type="button"
-                className="bg-gray-200 px-2 py-0.5 rounded text-sm"
-                onClick={() => {
-                  setCurrentTags((prev) => [...prev, tag]);
-                  setAvailableTags((prev) => prev.filter((t) => t !== tag));
-                }}
-              >
-                {tag}
-              </button>
+              <Tag key={tag}
+              text={tag}
+              canRemove={false}
+              onClick={() => {
+                setCurrentTags((prev) => [...prev, tag]);
+                setAvailableTags((prev) => prev.filter((t) => t !== tag));
+              }} />
             ))}
           </div>
           <div className="flex gap-2 mt-2">

@@ -110,7 +110,7 @@ const App = () => {
       dueDate: formData.get("dueDate") as string,
       priority: formData.get("priority") as "Low" | "Medium" | "High",
       assignee: formData.get("assignee") as string,
-      tags: editingTask?.tags || submittedTags,
+      tags: submittedTags,
       status: formData.get("status") as string,
     };
     if (editingTask) {
@@ -118,7 +118,7 @@ const App = () => {
         prev.map((t) => (t.id === editingTask.id ? newTask : t))
       );
     } else {
-      setTasks((prev) => [{ ...newTask, status: "To Do" }, ...prev]);
+      setTasks((prev) => [{ ...newTask}, ...prev]);
     }
     setIsModalOpen(false);
     setEditingTask(null);
@@ -144,7 +144,7 @@ const App = () => {
           </h1>
           <input
             className="border rounded px-2 py-1 w-1/3"
-            placeholder="Search tasks..."
+            placeholder="Search tasks by name, priority, tag or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
