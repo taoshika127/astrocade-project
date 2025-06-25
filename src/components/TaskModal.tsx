@@ -91,7 +91,7 @@ const TaskModal = ({ onClose, onSubmit, task, tags, setTags }: any) => {
             />
             <button
               type="button"
-              className="bg-green-500 text-white px-3 rounded"
+              className="bg-blue-500 text-white px-3 rounded"
               onClick={addTag}
             >
               Add

@@ -6,13 +6,10 @@ type TagProps = {
 
 // Define a fixed palette of Tailwind background classes
 const tagColors = [
-  "bg-red-100",
-  "bg-yellow-100",
-  "bg-green-100",
-  "bg-blue-100",
   "bg-indigo-100",
-  "bg-pink-100",
-  "bg-teal-100",
+  "bg-indigo-200",
+  "bg-blue-100",
+  "bg-blue-200",
 ];
 
 // Hash the tag text into a number, then map to a color index
