@@ -6,25 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import Section from "./components/Section";
 import TaskModal from "./components/TaskModal";
 import { priorities, initialSections, defaultTags} from "./utils/constants";
-
-const generateDummyTasks = (): Task[] => {
-  const dummy: Task[] = [];
-  for (let i = 1; i <= 15; i++) {
-    dummy.push({
-      id: uuidv4(),
-      name: `Task ${i}`,
-      description: `This is a description of task ${i}`,
-      status: initialSections[i % 4],
-      dueDate: new Date(
-        Date.now() + (Math.random() * 14 - 7) * 86400000
-      ).toISOString().slice(0, 10),
-      priority: priorities[i % 3] as "Low" | "Medium" | "High",
-      assignee: `User ${i % 5}`,
-      tags: [defaultTags[i % defaultTags.length]],
-    });
-  }
-  return dummy;
-};
+import generateDummyTasks from "./utils/generateDummyTasks";
 
 
 const App = () => {
@@ -33,7 +15,6 @@ const App = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [newSectionName, setNewSectionName] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<any>({});
   const [sort, setSort] = useState("");
@@ -124,13 +105,6 @@ const App = () => {
     setEditingTask(null);
   };
 
-  const addNewSection = () => {
-    if (newSectionName && !sections.includes(newSectionName)) {
-      setSections((prev) => [...prev, newSectionName]);
-      setNewSectionName("");
-    }
-  };
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gray-100 text-gray-800">
@@ -192,7 +166,7 @@ const App = () => {
         </div>
 
         {/* Task Board */}
-        <div className="flex overflow-x-auto p-4 space-x-4">
+        <div className="flex justify-center overflow-x-auto p-4 space-x-8">
           {sections.map((section) => (
             <Section
               key={section}
@@ -226,12 +200,12 @@ const App = () => {
               className="bg-white p-4 rounded shadow max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold">{selectedTask.name}</h2>
-              <p>{selectedTask.description}</p>
-              <p>Due: {selectedTask.dueDate}</p>
-              <p>Priority: {selectedTask.priority}</p>
-              <p>Assignee: {selectedTask.assignee}</p>
-              <p>Tags: {selectedTask.tags.join(", ")}</p>
+              <h2 className="text-xl font-bold pb-3">{selectedTask.name}</h2>
+              <p className="pb-3">{selectedTask.description}</p>
+              <p className="pb-3"><span className="font-bold">Due: </span>{selectedTask.dueDate}</p>
+              <p className="pb-3"><span className="font-bold">Priority: </span>{selectedTask.priority}</p>
+              <p className="pb-3"><span className="font-bold">Assignee: </span>{selectedTask.assignee}</p>
+              <p className="pb-3"><span className="font-bold">Tags: </span>{selectedTask.tags.join(", ")}</p>
               <button
                 className="mt-4 bg-blue-600 text-white px-4 py-1 rounded"
                 onClick={() => {

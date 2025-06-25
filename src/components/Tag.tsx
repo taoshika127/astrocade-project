@@ -45,7 +45,7 @@ const Tag = ({ onClick, text, canRemove }: TagProps) => {
     <button
       type="button"
       onClick={onClick}
-      className={`${colorClass} px-2 py-0.5 rounded text-sm`}
+      className={`${colorClass} px-2 py-0.5 my-1 rounded text-sm`}
     >
       {text}
     </button>

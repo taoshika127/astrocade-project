@@ -26,11 +26,11 @@ const TaskCard = ({ task, onClick }: any) => {
       className="bg-gray-100 p-2 rounded mb-2 cursor-pointer shadow"
     >
       <div className="flex justify-between py-2">
-      <div className="font-semibold">{task.name}</div>
+      <div className="font-semibold pb-2">{task.name}</div>
       <div className={`${setTextColor(task.priority)} text-sm`}>{task.priority}</div>
       </div>
-      <p className="text-sm">{task.dueDate}</p>
-      {task.tags.map(tag => (<span className="pr-2 "><Tag text={tag} key={tag} canRemove={false} /></span>))}
+      <p className="text-sm pb-2">{"Due: " + task.dueDate}</p>
+      {task.tags.map(tag => (<span className="pr-2"><Tag text={tag} key={tag} canRemove={false} /></span>))}
     </div>
   );
 };
